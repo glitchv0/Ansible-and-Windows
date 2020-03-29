@@ -80,14 +80,6 @@
         ansible_winrm_transport: kerberos
       # no_log: true
 
-
-    - name: Set registry key for computer description
-      win_regedit:
-        path: HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
-        name: srvcomment
-        data: "{{ description }}"
-      delegate_to: "{{ server_name }}"
-
     - name: Move AD Computer
       win_domain_computer:
         name: "{{ server_name|upper }}"
@@ -97,6 +89,15 @@
         enabled: yes
         state: present
       delegate_to: "{{ dcname }}"
+
+
+    - name: Set registry key for computer description
+      win_regedit:
+        path: HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
+        name: srvcomment
+        data: "{{ description }}"
+      delegate_to: "{{ server_name }}"
+
 
     - name: Restart Computer
       win_reboot:
