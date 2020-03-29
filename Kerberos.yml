@@ -8,7 +8,7 @@
     - name: "Make sure Kerberos Client is installed"
       dnf:
         name:
-            - krb5-user
+            - krb5-workstation
             - krb5-devel
             - krb5-libs
         state: latest
