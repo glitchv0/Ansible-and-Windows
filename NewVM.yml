@@ -58,7 +58,7 @@
 
     - name: Add Server to host Inventory
       add_host:
-        name: "{{ server_name }}"
+        name: "{{ serverip }}"
         ansible_port: 5985
         ansible_user: "{{ domain_username }}"
         ansible_password: "{{ domain_password }}"
