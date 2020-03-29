@@ -65,6 +65,7 @@
         ansible_password: "{{ domain_password }}"
         ansible_winrm_server_cert_validation: ignore
         ansible_connection: "winrm"
+        ansible_winrm_transport: kerberos
       no_log: true
 
     - name: Add DC to host Inventory
@@ -75,6 +76,7 @@
         ansible_user: "{{ domain_username }}"
         ansible_password: "{{ domain_password }}"
         ansible_connection: "winrm"
+        ansible_winrm_transport: kerberos
       no_log: true
 
 
