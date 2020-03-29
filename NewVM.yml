@@ -60,7 +60,7 @@
       add_host:
         name: "{{ server_name }}"
         ansible_port: 5985
-        ansible_user: "{{ domain_user }}"
+        ansible_user: "{{ domain_username }}"
         ansible_password: "{{ domain_password }}"
         ansible_winrm_server_cert_validation: ignore
         ansible_connection: "winrm"
@@ -70,7 +70,7 @@
         name: "{{ dcname }}"
         ansible_winrm_server_cert_validation: ignore
         ansible_port: 5985
-        ansible_user: "{{ domain_user }}"
+        ansible_user: "{{ domain_username }}"
         ansible_password: "{{ domain_password }}"
         ansible_connection: "winrm"
 
@@ -86,7 +86,7 @@
         name: "{{ server_name|upper }}"
         dns_hostname: "{{ server_name|upper }}.{{ domain }}"
         ou: "{{ OU }}"
-        description: "VM - {{ business_unit }} - {{ description }}"
+        description: "{{ description }}"
         enabled: yes
         state: present
       delegate_to: "{{ dcname }}"
