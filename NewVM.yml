@@ -58,12 +58,14 @@
 
     - name: Add Server to host Inventory
       add_host:
-        name: "{{ server_name }}"
+        name: "{{ server_name |upper }}"
+        ansible_host: "{{ serverip }}"
         ansible_port: 5986
         ansible_user: "{{ domain_username }}"
         ansible_password: "{{ domain_password }}"
         ansible_winrm_server_cert_validation: ignore
         ansible_connection: "winrm"
+      no_log: true
 
     - name: Add DC to host Inventory
       add_host:
@@ -73,6 +75,8 @@
         ansible_user: "{{ domain_username }}"
         ansible_password: "{{ domain_password }}"
         ansible_connection: "winrm"
+      no_log: true
+
 
     - name: Set registry key for computer description
       win_regedit:
