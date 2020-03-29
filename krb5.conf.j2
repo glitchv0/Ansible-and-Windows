@@ -10,14 +10,14 @@
  forwardable = true
  rdns = false
  #default_ccache_name = KEYRING:persistent:%{uid}
- default_realm = "{{ domain | upper }}"
+ default_realm = {{ domain | upper }}
 
 [realms]
-  "{{ domain | upper }}" = {
-    admin_server = "{{ dc | upper }}"
-    kdc = "{{ dc | upper }}"
+  {{ domain | upper }} = {
+    admin_server = {{ dc | upper }}
+    kdc = {{ dc | upper }}
   }
 
 [domain_realm]
- "{{ domain | lower }}" = "{{ domain | upper }}"
- ."{{ domain | upper }}" = "{{ domain | upper }}"
+ {{ domain | lower }} = {{ domain | upper }}
+ .{{ domain | upper }} = {{ domain | upper }}
