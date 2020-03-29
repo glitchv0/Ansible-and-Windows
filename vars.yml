@@ -3,9 +3,8 @@ server_name:
 os_version:
 cluster:
 datacenter:
-business_unit:
+vmfolder:
 datastore:
-vlan:
 dns1:
 dns2:
 vmnetname:
@@ -17,8 +16,6 @@ cpu_cores:
 description:
 domain:
 fullname:
-orgname:
-joindomain:
 tz:
 dcname:
 vm_disks: []

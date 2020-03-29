@@ -4,8 +4,8 @@
   gather_facts: false
   hosts: localhost
   tasks:
-    - name: Include vars file
-      include_vars: vars.yml
+    # - name: Include vars file
+    #   include_vars: vars.yml
 
     - name: "Clone the template"
       vmware_guest:
@@ -16,7 +16,7 @@
         validate_certs: false
         cluster: "{{ cluster }}"
         datacenter: "{{ datacenter }}"
-        folder: "{{ business_unit }}"
+        folder: "{{ vmfolder }}"
         state: poweredon
         datastore: "{{ datastore }}"
         annotation: "{{ description }} - Server Setup: {{ '%m-%d-%Y' | strftime }}"
@@ -41,14 +41,14 @@
           domain: "{{ domain }}"
           domainadmin: "{{ domain_username }}"
           domainadminpassword: "{{ domain_password }}"
-          fullname: " {{ fullname }}"
-          orgname: "{{ orgname }}"
-          joindomain: "{{ joindomain }}"
+          fullname: " {{ domain }}"
+          orgname: "{{ domain }}"
+          joindomain: "{{ domain }}"
           timezone: "{{ tz }}"
           autologon: True
           password: '{{ localwin_password }}'
           # runonce:
-          # - powershell.exe -ExecutionPolicy Unrestricted -File C:\Windows\Temp\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
+          # - powershell.exe -ExecutionPolicy Unrestricted -File C:\Windows\Temp\ConfigureRemotingForAnsible.ps1
         wait_for_customization: 'Yes'
         wait_for_ip_address: 'No'
 
@@ -74,120 +74,12 @@
         ansible_password: "{{ domain_password }}"
         ansible_connection: "winrm"
 
-    - name: Expand OS Disk if Required
-      vmware_guest_disk:
-        hostname: '{{ lookup("env", "VMWARE_HOST") }}'
-        username: '{{ lookup("env", "VMWARE_USER") }}'
-        password: '{{ lookup("env", "VMWARE_PASSWORD") }}'
-        name: "{{ server_name |upper }}"
-        datacenter: "{{ datacenter }}"
-        validate_certs: false
-        disk:
-          - size_gb: "{{ vm_disks[item].size_gb }}"
-            type: thick
-            datastore: "{{ datastore }}"
-            scsi_controller: 0
-            unit_number: 0
-      loop: "{{ range(0, vm_disks|length)|list }}"
-      when: vm_disks[item].drive_letter == 'C'
-
-    - name: Attach Additional VMware Disks
-      vmware_guest_disk:
-        hostname: '{{ lookup("env", "VMWARE_HOST") }}'
-        username: '{{ lookup("env", "VMWARE_USER") }}'
-        password: '{{ lookup("env", "VMWARE_PASSWORD") }}'
-        name: "{{ server_name|upper }}"
-        datacenter: "{{ datacenter }}"
-        validate_certs: false
-        disk:
-          - size_gb: "{{ vm_disks[item].size_gb }}"
-            type: thick
-            datastore: "{{ datastore }}"
-            scsi_controller: 0
-            unit_number: "{{ item }}"
-      loop: "{{ range(0, vm_disks|length)|list }}"
-      when: vm_disks[item].drive_letter != 'C'
-
-
     - name: Set registry key for computer description
       win_regedit:
         path: HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
         name: srvcomment
-        data: "VM - {{ business_unit }} - {{ description }}"
+        data: "{{ description }}"
       delegate_to: "{{ server_name }}"
-
-    - name: Check for Storage DSC Powershell module
-      win_psmodule:
-        name: StorageDsc
-        state: present
-      delegate_to: "{{ server_name }}"
-
-    - name: Update storage
-      win_shell: Update-HostStorageCache -ErrorAction SilentlyContinue
-      changed_when: false
-      delegate_to: "{{ server_name }}"
-
-    - name: Set defrag service to manual
-      win_dsc:
-        resource_name: Service
-        Name: defragsvc
-        StartupType: manual
-        State: Stopped
-      delegate_to: "{{ server_name }}"
-
-
-    - name: Check Storage C
-      win_dsc:
-        resource_name: WaitForDisk
-        DiskID: 0
-        RetryIntervalSec: 3
-        RetryCount: 3
-      delegate_to: "{{ server_name }}"
-      ignore_errors: True
-      loop: "{{ range(0, vm_disks|length)|list }}"
-      when: vm_disks[item].drive_letter == 'C'
-
-    - name: Get C Drive Partition Style
-      win_shell: (Get-Disk -Number 0).PartitionStyle.trim()
-      delegate_to: "{{ server_name }}"
-      register: CDrivePartStyle
-
-    - name: Setup C Drive
-      win_dsc:
-        resource_name: Disk
-        DiskID: 0
-        DriveLetter: C
-        FSLabel: "{{ vm_disks[item].volume_name }}"
-        PartitionStyle: "{{ CDrivePartStyle.stdout_lines|join }}"
-        AllowDestructive: True
-      delegate_to: "{{ server_name }}"
-      ignore_errors: True
-      loop: "{{ range(0, vm_disks|length)|list }}"
-      when: vm_disks[item].drive_letter == 'C'
-
-    - name: Check Additional Drives
-      win_dsc:
-        resource_name: WaitForDisk
-        DiskID: "{{ item }}"
-        RetryIntervalSec: 3
-        RetryCount: 3
-      delegate_to: "{{ server_name }}"
-      ignore_errors: True
-      loop: "{{ range(0, vm_disks|length)|list }}"
-      when: vm_disks[item].drive_letter != 'C'
-
-    - name: Setup Additional Drive
-      win_dsc:
-        resource_name: Disk
-        DiskID: "{{ item }}"
-        DriveLetter: "{{ vm_disks[item].drive_letter }}"
-        FSLabel: "{{ vm_disks[item].volume_name }}"
-        PartitionStyle: GPT
-        AllowDestructive: True
-      delegate_to: "{{ server_name }}"
-      ignore_errors: True
-      loop: "{{ range(0, vm_disks|length)|list }}"
-      when: vm_disks[item].drive_letter != 'C'
 
     - name: Move AD Computer
       win_domain_computer:
