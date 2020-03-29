@@ -79,7 +79,7 @@
         path: HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
         name: srvcomment
         data: "{{ description }}"
-      delegate_to: "{{ serverip }}"
+      delegate_to: "{{ server_name }}"
 
     - name: Move AD Computer
       win_domain_computer:
@@ -93,4 +93,4 @@
 
     - name: Restart Computer
       win_reboot:
-      delegate_to: "{{ serverip }}"
+      delegate_to: "{{ server_name }}"
