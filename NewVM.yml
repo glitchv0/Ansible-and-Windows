@@ -47,8 +47,8 @@
           timezone: "{{ tz }}"
           autologon: True
           password: '{{ localwin_password }}'
-          # runonce:
-          # - powershell.exe -ExecutionPolicy Unrestricted -File C:\Windows\Temp\ConfigureRemotingForAnsible.ps1
+          runonce:
+          - powershell.exe -ExecutionPolicy Unrestricted -File C:\Windows\Temp\ConfigureRemotingForAnsible.ps1
         wait_for_customization: 'Yes'
         wait_for_ip_address: 'No'
 
@@ -59,7 +59,7 @@
     - name: Add Server to host Inventory
       add_host:
         name: "{{ serverip }}"
-        ansible_port: 5985
+        ansible_port: 5986
         ansible_user: "{{ domain_username }}"
         ansible_password: "{{ domain_password }}"
         ansible_winrm_server_cert_validation: ignore
@@ -69,7 +69,7 @@
       add_host:
         name: "{{ dcname }}"
         ansible_winrm_server_cert_validation: ignore
-        ansible_port: 5985
+        ansible_port: 5986
         ansible_user: "{{ domain_username }}"
         ansible_password: "{{ domain_password }}"
         ansible_connection: "winrm"
