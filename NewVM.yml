@@ -103,6 +103,7 @@
       wait_for:
         port: 5986
         delay: 10
+      delegate_to: "{{ server_name }}"
 
     - name: Set registry key for computer description
       win_regedit:
