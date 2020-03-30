@@ -50,7 +50,7 @@
           runonce:
           - powershell.exe -ExecutionPolicy Unrestricted -File C:\Windows\Temp\ConfigureRemotingForAnsible.ps1
         wait_for_customization: 'Yes'
-        wait_for_ip_address: 'No'
+        wait_for_ip_address: 'Yes'
 
     - name: Wait for 10 Seconds
       wait_for:
@@ -88,6 +88,13 @@
         description: "{{ description }}"
         enabled: yes
         state: present
+      delegate_to: "{{ dcname }}"
+
+    - name: Setup DNS
+      win_dns_record:
+        name: "{{ server_name |upper }}"
+        type: "A"
+        value: "{{ serverip }}"
       delegate_to: "{{ dcname }}"
 
 
