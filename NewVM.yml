@@ -61,11 +61,11 @@
           runonce:
           - powershell.exe -ExecutionPolicy Unrestricted -File C:\Windows\Temp\ConfigureRemotingForAnsible.ps1
         wait_for_customization: 'Yes'
-        wait_for_ip_address: 'no'
+        wait_for_ip_address: 'No'
 
-    - name: Wait for 10 Seconds
+    - name: Wait for 20 Seconds for things to boot up
       wait_for:
-        timeout: 10
+        timeout: 20
 
     - name: Add Server to host Inventory
       add_host:
@@ -98,12 +98,6 @@
         enabled: yes
         state: present
       delegate_to: "{{ dcname }}"
-
-    - name: Wait for WinRM to wake up
-      wait_for:
-        port: 5986
-        delay: 10
-      delegate_to: "{{ server_name }}"
 
     - name: Set registry key for computer description
       win_regedit:
