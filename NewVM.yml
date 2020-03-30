@@ -99,14 +99,10 @@
         state: present
       delegate_to: "{{ dcname }}"
 
-    # - name: Setup DNS
-    #   win_dns_record:
-    #     name: "{{ server_name |upper }}"
-    #     type: "A"
-    #     value: "{{ serverip }}"
-    #     zone: "{{ domain }}"
-    #   delegate_to: "{{ dcname }}"
-
+    - name: Wait for WinRM to wake up
+      wait_for:
+        port: 5986
+        delay: 10
 
     - name: Set registry key for computer description
       win_regedit:
