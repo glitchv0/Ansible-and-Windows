@@ -14,8 +14,8 @@
 
 [realms]
   {{ domain | upper }} = {
-    admin_server = {{ dc | upper }}
-    kdc = {{ dc | upper }}
+    admin_server = {{ dcname | upper }}
+    kdc = {{ dcname | upper }}
   }
 
 [domain_realm]
