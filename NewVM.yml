@@ -4,8 +4,19 @@
   gather_facts: false
   hosts: localhost
   tasks:
-    # - name: Include vars file
-    #   include_vars: vars.yml
+
+    - name: "Make sure Kerberos Client is installed"
+      dnf:
+        name:
+            - krb5-workstation
+            - krb5-devel
+            - krb5-libs
+        state: latest
+
+    - name: "Copy krb5.conf template"
+      template:
+        src: krb5.conf.j2
+        dest: /etc/krb5.conf
 
     - name: "Clone the template"
       vmware_guest:
@@ -41,8 +52,8 @@
           domain: "{{ domain }}"
           domainadmin: "{{ domain_username }}"
           domainadminpassword: "{{ domain_password }}"
-          fullname: " {{ domain }}"
-          orgname: "{{ domain }}"
+          fullname: " {{ company }}"
+          orgname: "{{ company }}"
           joindomain: "{{ domain }}"
           timezone: "{{ tz }}"
           autologon: True
@@ -65,7 +76,7 @@
         ansible_winrm_server_cert_validation: ignore
         ansible_connection: "winrm"
         ansible_winrm_transport: kerberos
-      # no_log: true
+      no_log: true
 
     - name: Add DC to host Inventory
       add_host:
@@ -76,7 +87,7 @@
         ansible_password: "{{ domain_password }}"
         ansible_connection: "winrm"
         ansible_winrm_transport: kerberos
-      # no_log: true
+      no_log: true
 
     - name: Move AD Computer
       win_domain_computer:
@@ -88,13 +99,13 @@
         state: present
       delegate_to: "{{ dcname }}"
 
-    - name: Setup DNS
-      win_dns_record:
-        name: "{{ server_name |upper }}"
-        type: "A"
-        value: "{{ serverip }}"
-        zone: "{{ domain }}"
-      delegate_to: "{{ dcname }}"
+    # - name: Setup DNS
+    #   win_dns_record:
+    #     name: "{{ server_name |upper }}"
+    #     type: "A"
+    #     value: "{{ serverip }}"
+    #     zone: "{{ domain }}"
+    #   delegate_to: "{{ dcname }}"
 
 
     - name: Set registry key for computer description
