@@ -95,6 +95,7 @@
         name: "{{ server_name |upper }}"
         type: "A"
         value: "{{ serverip }}"
+        zone: "{{ domain }}"
       delegate_to: "{{ dcname }}"
 
 
