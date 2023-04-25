@@ -1,0 +1,19 @@
+---
+- name: "Setup Kerberos on AWX"
+  connection: local
+  gather_facts: false
+  hosts: localhost
+  tasks:
+
+    - name: "Make sure Kerberos Client is installed"
+      dnf:
+        name:
+            - krb5-workstation
+            - krb5-devel
+            - krb5-libs
+        state: latest
+
+    - name: "Copy krb5.conf template"
+      template:
+        src: krb5.conf.j2
+        dest: /etc/krb5.conf
